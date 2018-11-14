@@ -1,7 +1,8 @@
 # https://pymotw.com/2/select/
 
-import socket, select
-import utils
+import socket
+import select
+# import utils
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(('localhost', 50002))
 # if use s.bind(s.gethostname(), 50002) , server would be visiable to outside world
@@ -32,17 +33,18 @@ while 1:
             # reads data from the socket in batches of 1024 bytes.
             msg = conn.recv(1024)
             print(msg)
-            conn.send(b'Welcome \n Please type in your username or "exit" to stop:')
+            conn.send(
+                b'Welcome \n Please type in your username or "exit" to stop:')
             data = conn.recv(1024)
             msg = data.decode('UTF-8')
 
             if msg == 'exit':
                 conn.send(b'\n bye ~ ~')
-                break # close the connection
+                break  # close the connection
             else:
                 all_sockets.append(conn)
                 all_clients[msg] = conn
-                print( msg + ' joined ')
+                print(msg + ' joined ')
                 conn.send(b'\n options: xxxxx')
         else:
             data = r.recv(1024)
@@ -52,6 +54,6 @@ while 1:
             if data.decode('UTF-8') == 'exit':
                 r.send(b'\n bye ~ ~')
                 r.close()
-                all_sockets.remove(r) # close the connection
+                all_sockets.remove(r)  # close the connection
 
         count += 1
