@@ -97,6 +97,7 @@ class ClientSM:
                     poem_idx = my_msg[1:].strip()
                     mysend(self.s, json.dumps({"action":"poem", "target":poem_idx}))
                     poem = json.loads(myrecv(self.s))["results"]
+                    # print(poem)
                     if (len(poem) > 0):
                         self.out_msg += poem + '\n\n'
                     else:
@@ -106,22 +107,15 @@ class ClientSM:
                     self.out_msg += menu
 
             if len(peer_msg) > 0:
-                try:
-                    peer_msg = json.loads(peer_msg)
-                except Exception as err :
-                    self.out_msg += " json.loads failed " + str(err)
-                    return self.out_msg
-            
+                peer_msg = json.loads(peer_msg)
                 if peer_msg["action"] == "connect":
+                    self.peer = peer_msg["from"]
+                    self.out_msg += 'Request from ' + self.peer + '\n'
+                    self.out_msg += 'You are connected with ' + self.peer
+                    self.out_msg += '. Chat away!\n\n'
+                    self.out_msg += '------------------------------------\n'
+                    self.state = S_CHATTING
 
-                    # ----------your code here------#
-                    print(peer_msg)
-                    pass
-
-
-
-                    # ----------end of your code----#
-                    
 #==============================================================================
 # Start chatting, 'bye' for quit
 # This is event handling instate "S_CHATTING"
@@ -134,17 +128,15 @@ class ClientSM:
                     self.state = S_LOGGEDIN
                     self.peer = ''
             if len(peer_msg) > 0:    # peer's stuff, coming in
-  
-
-                # ----------your code here------#
                 peer_msg = json.loads(peer_msg)
-                print(peer_msg)
-                pass
+                if peer_msg["action"] == "connect":
+                    self.out_msg += "(" + peer_msg["from"] + " joined)\n"
+                elif peer_msg["action"] == "disconnect":
+                    self.state = S_LOGGEDIN
+                else:
+                    self.out_msg += peer_msg["from"] + peer_msg["message"]
 
 
-
-                # ----------end of your code----#
-                
             # Display the menu again
             if self.state == S_LOGGEDIN:
                 self.out_msg += menu
